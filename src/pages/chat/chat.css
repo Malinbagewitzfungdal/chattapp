@@ -27,7 +27,7 @@
 
 .chat-bubble {
   position: relative;
-  padding: 10px 15px;
+  padding: 15px;
   border-radius: 12px;
   max-width: 60%;
   word-wrap: break-word;
@@ -47,12 +47,12 @@
 
 .delete-btn {
   position: absolute;
-  top: 5px;
-  right: 8px;
+  top: 2px;
+  right: 2px;
   background: transparent;
   border: none;
   color: red;
-  font-size: 16px;
+  font-size: 10px;
   cursor: pointer;
 }
 

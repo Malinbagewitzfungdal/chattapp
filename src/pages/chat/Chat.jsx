@@ -1,11 +1,8 @@
 import "./Chat.css";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import {
-  fetchMessages,
-  createMessage,
-  deleteMessage,
-} from "../../services/authService";
+import { fetchMessages, createMessage, deleteMessage } from "../../services/authService";
+import SideNav from "../../components/SideNav";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -34,15 +31,15 @@ export default function Chat() {
   const loadMessages = async () => {
     try {
       const data = await fetchMessages(conversationId);
-      const gunillaMessages = [
-        { id: "g1", userId: "gunilla", content: "Hej! Hur mår du?" },
-        {
-          id: "g2",
-          userId: "gunilla",
-          content: "Jag tycker vi borde ta en fika snart ☕",
-        },
-      ];
-      setMessages([...data, ...gunillaMessages]);
+      if (!data || data.length === 0) {
+        const gunillaMessages = [
+          { id: "g1", userId: "gunilla", content: "Hej! Hur mår du?" },
+          { id: "g2", userId: "gunilla", content: "Jag tycker vi borde ta en fika snart ☕" },
+        ];
+        setMessages(gunillaMessages);
+      } else {
+        setMessages(data);
+      }
     } catch (error) {
       console.error("Kunde inte hämta meddelanden:", error);
     }
@@ -51,7 +48,9 @@ export default function Chat() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
+
     const sanitized = newMessage.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
     try {
       const savedMessage = await createMessage(sanitized, conversationId);
       setMessages((prev) => [...prev, savedMessage]);
@@ -70,46 +69,48 @@ export default function Chat() {
     }
   };
 
-  if (!user) return <div>Loading user...</div>;
+  if (!user) {
+    return <div>Loading user...</div>;
+  }
 
   return (
-    <div className="chat-container">
-      <h2 className="chat-title">Chatt</h2>
-      <div className="chat-messages">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`chat-bubble ${
-              msg.userId === user.id ? "own-message" : "other-message"
-            }`}
-          >
-            <span>
-              {msg.userId === "gunilla" ? "Gunilla: " : ""}
-              {msg.content}
-            </span>
-            {msg.userId === user.id && (
-              <button
-                className="delete-btn"
-                onClick={() => handleDeleteMessage(msg.id)}
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        ))}
+    <div className="chat-page" style={{ display: "flex" }}>
+      <SideNav user={user} />
+      <div className="chat-container" style={{ flex: 1 }}>
+        <h2 className="chat-title">Chatt</h2>
+        <div className="chat-messages">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`chat-bubble ${
+                String(msg.userId) === String(user.id) ? "own-message" : "other-message"
+              }`}
+            >
+              <span>
+                {msg.userId === "gunilla" ? "Gunilla: " : ""}
+                {msg.content}
+              </span>
+              {String(msg.userId) === String(user.id) && (
+                <button className="delete-btn" onClick={() => handleDeleteMessage(msg.id)}>
+                  &#10005;
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        <form onSubmit={handleSendMessage} className="chat-form">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Skriv ett meddelande"
+            className="chat-input"
+          />
+          <button type="submit" className="chat-send-btn">
+            Skicka
+          </button>
+        </form>
       </div>
-      <form onSubmit={handleSendMessage} className="chat-form">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Skriv ett meddelande"
-          className="chat-input"
-        />
-        <button type="submit" className="chat-send-btn">
-          Skicka
-        </button>
-      </form>
     </div>
   );
 }

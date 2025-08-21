@@ -1,4 +1,4 @@
-// Hämta CSRF-token
+
 export const getCsrfToken = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/csrf`, {
@@ -15,7 +15,7 @@ export const getCsrfToken = async () => {
   }
 };
 
-// Registrera användare
+
 export const registerUser = async ({ username, email, password, csrfToken }) => {
   const avatar = "https://i.pravatar.cc/200";
   try {
@@ -34,7 +34,7 @@ export const registerUser = async ({ username, email, password, csrfToken }) => 
   }
 };
 
-// Logga in användare
+
 export const loginUser = async ({ username, password, csrfToken }) => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/token`, {
@@ -46,7 +46,7 @@ export const loginUser = async ({ username, password, csrfToken }) => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Login failed');
 
-    // Spara bara token eftersom API returnerar inget användarobjekt
+ 
     localStorage.setItem('token', data.token);
 
     return data;
@@ -56,13 +56,13 @@ export const loginUser = async ({ username, password, csrfToken }) => {
   }
 };
 
-// Hämta alla meddelanden
+
 export const fetchMessages = async (conversationId) => {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
 
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/messages?conversationId=${conversationId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/messages`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -83,7 +83,7 @@ export const fetchMessages = async (conversationId) => {
   }
 };
 
-// Skapa nytt meddelande
+
 export const createMessage = async (text, conversationId) => {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
@@ -101,10 +101,9 @@ export const createMessage = async (text, conversationId) => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Failed to create message');
 
-    // API returnerar latestMessage med id, text och conversationId
     return {
       id: data.latestMessage.id,
-      userId: data.latestMessage.userId || 'unknown', // fallback om API inte skickar userId
+      userId: data.latestMessage.userId || 'unknown', 
       content: data.latestMessage.text,
       conversationId: data.latestMessage.conversationId,
       createdAt: data.latestMessage.createdAt || new Date().toISOString()
@@ -115,7 +114,7 @@ export const createMessage = async (text, conversationId) => {
   }
 };
 
-// Radera meddelande
+
 export const deleteMessage = async (id) => {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
@@ -141,10 +140,10 @@ export const deleteMessage = async (id) => {
   }
 };
 
-// Logga ut användare
+
 export const logoutUser = () => {
   localStorage.removeItem('token');
 };
 
-// Kolla om användare är inloggad
+
 export const isLoggedIn = () => !!localStorage.getItem('token');

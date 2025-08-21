@@ -1,4 +1,4 @@
-// src/components/LandingPage.jsx
+
 import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {

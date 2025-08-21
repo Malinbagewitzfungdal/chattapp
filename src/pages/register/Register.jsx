@@ -44,7 +44,7 @@ export default function Register() {
         email,
         password,
         csrfToken,
-        avatar: "https://i.pravatar.cc/200", // Lägg till en default-avatar
+        avatar: "https://i.pravatar.cc/200", 
       });
       setSuccess(true);
       setTimeout(() => navigate("/login"), 1500);
